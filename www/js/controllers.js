@@ -4,7 +4,7 @@ angular.module('RelayAppTest.Controllers', ['ngCordova'])
     .controller('HomeCtrl', function($cordovaPush, $rootScope, $scope) {
 
         var androidConfig = {
-            senderID: "webplud3project"
+            senderID: "69940692162"
         };
 
         $scope.registering = false;
