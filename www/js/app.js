@@ -1,12 +1,15 @@
-var pushNotification;
+/* globals angular cordova StatusBar */
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+angular.module('starter', ['ionic', 'ngCordova'])
+.run(function($ionicPlatform, $cordovaPush, $rootScope) {
 
-.run(function($ionicPlatform) {
-
+  var androidConfig = {
+    "senderID": "webplud3project",
+  };
+  
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -17,46 +20,39 @@ angular.module('starter', ['ionic'])
       StatusBar.styleDefault();
     }
 
-    pushNotification = window.plugins.pushNotification;
+    $cordovaPush.register(androidConfig).then(function(result) {
+      // Success
+       alert('result = ' + result);
+    }, function(err) {
+      // Error
+      
+      alert('error = ' + err);
+    });
+    
+    
+    $rootScope.$on('$cordovaPush:notificationReceived', function(event, notification) {
+      switch(notification.event) {
+        case 'registered':
+          if (notification.regid.length > 0 ) {
+            alert('registration ID = ' + notification.regid);
+          }
+          break;
+
+        case 'message':
+          // this is the actual push notification. its format depends on the data model from the push server
+          alert('message = ' + notification.message + ' msgCount = ' + notification.msgcnt);
+          break;
+
+        case 'error':
+          alert('GCM error = ' + notification.msg);
+          break;
+
+        default:
+          alert('An unknown GCM event has occurred');
+          break;
+      }
+    });
 
 
-    function successHandler(result) {
-      alert('result = ' + result);
-    }
-
-    function errorHandler(error) {
-      alert('error = ' + error);
-    }
-
-    pushNotification.register(
-      successHandler,
-      errorHandler, {
-        "senderID": "webplud3project",
-        "ecb": "onNotification"
-      });
   });
 });
-
-function onNotification(e) {
-  switch (e.event) {
-    case 'registered':
-      if (e.regid.length > 0) {
-        console.log("Regid " + e.regid);
-        alert('registration id = ' + e.regid);
-      }
-      break;
-
-    case 'message':
-      // this is the actual push notification. its format depends on the data model from the push server
-      alert('message = ' + e.message + ' msgcnt = ' + e.msgcnt);
-      break;
-
-    case 'error':
-      alert('GCM error = ' + e.msg);
-      break;
-
-    default:
-      alert('An unknown GCM event has occurred');
-      break;
-  }
-}
