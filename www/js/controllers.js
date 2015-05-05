@@ -19,12 +19,14 @@ angular.module('RelayAppTest.Controllers', ['ngCordova'])
                         // Success
                         alert('result = ' + result);
                         $scope.registering = false;
+                        $scope.$digest();
                     },
                     function(err) {
                         // Error
     
                         alert('error = ' + err);
                         $scope.registering = false;
+                        $scope.$digest();
                     }, {
                         "senderID": androidConfig.senderID,
                         "ecb": "onNotificationGCM"
