@@ -29,9 +29,12 @@ angular.module('RelayAppTest.Controllers', ['ngCordova'])
                 alert('exception = ' + ex);
                 $scope.registering = false;
             }
-        }
+        };
 
-        $rootScope.$on('$cordovaPush:notificationReceived', function(event, notification) {
+        $scope.$on('$cordovaPush:notificationReceived', function(event, notification) {
+            
+            alert("notificationReceived" + angular.toJson(notification));
+            
             switch (notification.event) {
                 case 'registered':
                     if (notification.regid.length > 0) {
