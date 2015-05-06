@@ -56,19 +56,20 @@ angular.module('RelayAppTest.Controllers', ['ngCordova', "ionic"])
             $scope.registered = {
               senderID: $scope.androidConfig.senderID,
               targetCode: notification.regid
-            }
+            };
             localstorage.setObject("androidRegistration", $scope.registered);
           }
           break;
 
         case 'message':
           // this is the actual push notification. its format depends on the data model from the push server
-          log("push arrived!")
-          log('message = ' + notification.message + ' msgCount = ' + notification.msgcnt);
+          log("push arrived!");
+          log(angular.toJson(notification));
           break;
 
         case 'error':
-          log('GCM error = ' + notification.msg, 2);
+          log("GCM ERROR!");
+          log(angular.toJson(notification));
           break;
 
         default:
@@ -85,7 +86,7 @@ angular.module('RelayAppTest.Controllers', ['ngCordova', "ionic"])
         text: text,
         level: level
       };
-      $scope.messages.push(message);
+      $scope.messages.unshift(message);
     }
 
   });
