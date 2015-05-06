@@ -1,7 +1,9 @@
 /* globals angular */
 
-angular.module('RelayAppTest.Controllers', ['ngCordova'])
+angular.module('RelayAppTest.Controllers', ['ngCordova', "ionic"])
   .controller('HomeCtrl', function($cordovaPush, $rootScope, $scope, localstorage) {
+
+    $scope.platformReady = false;
 
     $scope.registering = false;
     $scope.androidConfig = localstorage.getObject("androidConfig") || {
@@ -10,10 +12,14 @@ angular.module('RelayAppTest.Controllers', ['ngCordova'])
     $scope.registered = localstorage.getObject("androidRegistration");
 
     $scope.messages = [];
+    
+    ionic.Platform.ready(function(){
+      log("platform ready!");
+    });
 
     $scope.register = function() {
       localstorage.setObject("androidConfig", $scope.androidConfig);
-      
+
       $scope.registering = true;
       try {
         $cordovaPush.register($scope.androidConfig).then(function(result) {

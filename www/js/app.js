@@ -6,7 +6,6 @@
 angular.module('RelayAppTest', ['ionic', 'RelayAppTest.Controllers'])
   .run(function($ionicPlatform, $cordovaPush, $rootScope) {
 
-    $rootScope.platformReady = false;
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
@@ -16,7 +15,6 @@ angular.module('RelayAppTest', ['ionic', 'RelayAppTest.Controllers'])
       if (window.StatusBar) {
         StatusBar.styleDefault();
       }
-      $rootScope.platformReady = true;
     });
   })
 
