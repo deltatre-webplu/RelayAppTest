@@ -1,116 +1,75 @@
 /* globals angular */
 
 angular.module('RelayAppTest.Controllers', ['ngCordova'])
-    .controller('HomeCtrl', function($cordovaPush, $rootScope, $scope) {
+  .controller('HomeCtrl', function($cordovaPush, $rootScope, $scope, localstorage) {
 
-        var androidConfig = {
-            senderID: "69940692162"
-        };
+    $scope.registering = false;
+    $scope.androidConfig = localstorage.getObject("androidConfig") || {
+      senderID: "326002124099"
+    };
+    $scope.registered = localstorage.getObject("androidRegistration");
 
+    $scope.messages = [];
+
+    $scope.register = function() {
+      localstorage.setObject("androidConfig", $scope.androidConfig);
+      
+      $scope.registering = true;
+      try {
+        $cordovaPush.register($scope.androidConfig).then(function(result) {
+          // Success
+          log("registration successful (" + result + ")");
+          $scope.registering = false;
+        }, function(err) {
+          log("registration error (" + err + ")", 2);
+          $scope.registering = false;
+        });
+      }
+      catch (ex) {
+        log("registration exception (" + ex + ")", 2);
         $scope.registering = false;
+      }
+    };
 
-        $scope.register = function() {
-            $scope.registering = true;
-            try
-            {
-                var pushNotification = window.plugins.pushNotification;
-                pushNotification.register(
-                    function(result) {
-                        // Success
-                        alert('result = ' + result);
-                        $scope.registering = false;
-                        $scope.$digest();
-                    },
-                    function(err) {
-                        // Error
-    
-                        alert('error = ' + err);
-                        $scope.registering = false;
-                        $scope.$digest();
-                    }, {
-                        "senderID": androidConfig.senderID,
-                        "ecb": "onNotificationGCM"
-                    });
-            }
-            catch (ex)
-            {
-                alert('exception = ' + ex);
-                $scope.registering = false;
-            }                    
-        };
-
-        /*        
-                $scope.register = function(){
-                    $scope.registering = true;
-                    try
-                    {
-                    $cordovaPush.register(androidConfig).then(function(result) {
-                        // Success
-                        alert('result = ' + result);
-                        $scope.registering = false;
-                    }, function(err) {
-                        // Error
-            
-                        alert('error = ' + err);
-                        $scope.registering = false;
-                    });
-                    }
-                    catch (ex)
-                    {
-                        alert('exception = ' + ex);
-                        $scope.registering = false;
-                    }
-                };
-
-                $scope.$on('$cordovaPush:notificationReceived', function(event, notification) {
-                    
-                    alert("notificationReceived" + angular.toJson(notification));
-                    
-                    switch (notification.event) {
-                        case 'registered':
-                            if (notification.regid.length > 0) {
-                                alert('registration ID = ' + notification.regid);
-                            }
-                            break;
-
-                        case 'message':
-                            // this is the actual push notification. its format depends on the data model from the push server
-                            alert('message = ' + notification.message + ' msgCount = ' + notification.msgcnt);
-                            break;
-
-                        case 'error':
-                            alert('GCM error = ' + notification.msg);
-                            break;
-
-                        default:
-                            alert('An unknown GCM event has occurred');
-                            break;
-                    }
-                });
-        */
-    });
-
-function onNotificationGCM(notification) {
-    alert("notificationReceived" + angular.toJson(notification));
-
-    switch (notification.event) {
+    $scope.$on('$cordovaPush:notificationReceived', function(event, notification) {
+      switch (notification.event) {
         case 'registered':
-            if (notification.regid.length > 0) {
-                alert('registration ID = ' + notification.regid);
+          if (notification.regid.length > 0) {
+            log('registration completed');
+            log(notification.regid);
+            $scope.registered = {
+              senderID: $scope.androidConfig.senderID,
+              targetCode: notification.regid
             }
-            break;
+            localstorage.setObject("androidRegistration", $scope.registered);
+          }
+          break;
 
         case 'message':
-            // this is the actual push notification. its format depends on the data model from the push server
-            alert('message = ' + notification.message + ' msgCount = ' + notification.msgcnt);
-            break;
+          // this is the actual push notification. its format depends on the data model from the push server
+          log("push arrived!")
+          log('message = ' + notification.message + ' msgCount = ' + notification.msgcnt);
+          break;
 
         case 'error':
-            alert('GCM error = ' + notification.msg);
-            break;
+          log('GCM error = ' + notification.msg, 2);
+          break;
 
         default:
-            alert('An unknown GCM event has occurred');
-            break;
+          log('An unknown GCM event has occurred: ' + notification.event, 1);
+          break;
+      }
+    });
+
+    function log(text, level) {
+      if (!angular.isDefined(level)) {
+        level = 0;
+      }
+      var message = {
+        text: text,
+        level: level
+      };
+      $scope.messages.push(message);
     }
-}
+
+  });
