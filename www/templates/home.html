@@ -14,7 +14,7 @@
       </label>
       <label class="item item-input">
         <span class="input-label">TargetCode</span>
-        <input type="text" name="targetCode" value="{{registered.targetCode}}" readonly="readonly">
+        <input type="text" name="targetCode" value="{{registered.targetCode}}" readonly="readonly" ng-click="copyToClipboard(registered.targetCode)">
       </label>
     </div>
 
@@ -34,7 +34,7 @@
     <h3 class="title positive">Log</h3>
     
     <ul class="list">
-      <li class="item" ng-repeat="message in messages">
+      <li class="item" ng-repeat="message in messages" ng-click="copyToClipboard(message.text)">
         {{message.text}}
       </li>
     </ul>

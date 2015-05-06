@@ -1,4 +1,4 @@
-/* globals angular */
+/* globals angular ionic cordova */
 
 angular.module('RelayAppTest.Controllers', ['ngCordova', "ionic"])
   .controller('HomeCtrl', function($cordovaPush, $rootScope, $scope, localstorage) {
@@ -12,8 +12,8 @@ angular.module('RelayAppTest.Controllers', ['ngCordova', "ionic"])
     $scope.registered = localstorage.getObject("androidRegistration");
 
     $scope.messages = [];
-    
-    ionic.Platform.ready(function(){
+
+    ionic.Platform.ready(function() {
       log("platform ready!");
     });
 
@@ -35,6 +35,16 @@ angular.module('RelayAppTest.Controllers', ['ngCordova', "ionic"])
         log("registration exception (" + ex + ")", 2);
         $scope.registering = false;
       }
+    };
+
+    $scope.copyToClipboard = function(text) {
+
+      cordova.exec(function() {
+          alert("copied to clipboard");
+        }, function() {
+          alert("error while copying to clipboard");
+        }, "Clipboard", "copy", [text]);
+
     };
 
     $scope.$on('$cordovaPush:notificationReceived', function(event, notification) {
